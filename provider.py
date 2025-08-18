@@ -6,12 +6,10 @@ class Provider:
         self.rating = rating
 
     def __lt__(self, other):
-        if self.service == other.service:
-            return self.name < other.name
-        return self.service < other.service
+        return self.provider_id < other.provider_id
 
     def __eq__(self, other):
-        return self.service == other.service and self.name == other.name
+        return self.provider_id == other.provider_id
 
     def __str__(self):
-        return f"[{self.provider_id}] {self.name} - {self.service} {self.rating}★"
+        return f"[{self.provider_id}] {self.name} - {self.service} {self.rating:.1f}★"
