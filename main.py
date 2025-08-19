@@ -1,6 +1,17 @@
 from btree import BTree, Provider
 from random import randint, uniform
+from mensajes import Mensajes
 import time
+from provider import rating_to_stars
+
+RESET   = "\033[0m"
+RED     = "\033[31m"
+GREEN   = "\033[32m"
+YELLOW  = "\033[33m"
+BLUE    = "\033[34m"
+MAGENTA = "\033[35m"
+CYAN    = "\033[36m"
+WHITE   = "\033[37m"
 
 general_continue = True
 
@@ -12,32 +23,37 @@ def main():
             option = menu()
             switch(option, btree)
         except ValueError:
-            print("\nERROR!, Ingrese un dato válido")
+            print(RED + "\nERROR!, Ingrese un dato válido" + RESET)
 
 def menu():
-    print("\n---Servicios Locales---")
+    print("\n ")
+    Mensajes.local_services()
     print("1. Registrar Proveedor")
     print("2. Buscar Servicio")
     print("3. Mostrar Proveedores")
     print("4. Clasificación Top 5 Proveedores")
     print("5. Salir")
-    option = int(input("Ingrese una opción: "))
+    option = int(input(YELLOW + "Ingrese una opción: " + RESET))
     return option
 
 def switch(option, btree):
     match option:
         case 1:
+            Mensajes.register_provider()
             register_provider(btree)
         case 2:
+            Mensajes.search_service()
             search_service(btree)
         case 3:
+            Mensajes.show_providers()
             show_providers(btree)
         case 4:
+            Mensajes.top5_providers()
             ranking_menu(btree)
         case 5:
             go_out()
         case _:
-            print("\nERROR!, Ingrese una opción válida (1 - 5)")
+            print(RED + "\nERROR!, Ingrese una opción válida (1 - 5)" + RESET)
 
 def register_provider(btree):
     provider_id = randint(1000, 9999)
@@ -50,7 +66,7 @@ def register_provider(btree):
     rating = calculate_rating()
     provider = Provider(provider_id, name, service, rating)
     btree.insert(provider)
-    print(f"\nProveedor registrado exitosamente")
+    print(GREEN + f"\nProveedor registrado exitosamente" + RESET)
 
 def calculate_rating():
     quantity = randint(10, 20)
@@ -60,7 +76,7 @@ def calculate_rating():
 
 def search_service(btree):
     if btree.is_empty():
-        print("\nNo hay proveedores registrados")
+        print(YELLOW + "\nNo hay proveedores registrados" + RESET)
         return
 
     service = input("\nIngrese el servicio a buscar: ")
@@ -79,7 +95,7 @@ def search_service(btree):
                 selected = next((p for p in ordered if p.provider_id == prov_id), None)
 
                 if selected:
-                    print(f"\nContrato iniciado con {selected.name} ({selected.service})...")
+                    print(YELLOW + f"\nContrato iniciado con {selected.name} ({selected.service})..." + RESET)
                     time.sleep(5)
                     print("\nContrato finalizado")
                     while True:
@@ -87,23 +103,23 @@ def search_service(btree):
                             new_rating = float(input("Califique el servicio (1.0 - 5.0): "))
                             if 1.0 <= new_rating <= 5.0:
                                 selected.rating = round((selected.rating + new_rating) / 2, 1)
-                                print(f"\nNueva calificación promedio de {selected.name}: {selected.rating}★")
+                                print(f"\nNueva calificación promedio de {selected.name}: {selected.rating:.1f} {rating_to_stars(selected.rating)}")
                                 break
                             else:
-                                print("Ingrese un valor entre 1.0 y 5.0")
+                                print(YELLOW + "Ingrese un valor entre 1.0 y 5.0" + RESET)
                         except ValueError:
-                            print("Ingrese un número válido")
+                            print(YELLOW + "Ingrese un número válido" + RESET)
                 else:
-                    print("\nNo se encontró un proveedor con ese ID")
+                    print(RED + "\nNo se encontró un proveedor con ese ID" + RESET)
             except ValueError:
-                print("\nIngrese un número válido")
+                print(RED + "\nIngrese un número válido" + RESET)
     else:
-        print("\nNo se encontraron proveedores para el servicio solicitado")
+        print(RED + "\nNo se encontraron proveedores para el servicio solicitado" + RESET)
 
 
 def show_providers(btree):
     if btree.is_empty():
-        print("\nNo hay proveedores registrados")
+        print(RED + "\nNo hay proveedores registrados" + RESET)
         return
     print("\nLista de Proveedores:")
     btree.traverse()
@@ -133,8 +149,7 @@ def ranking_menu(btree):
     if btree.is_empty():
         print("\nNo hay proveedores registrados")
         return
-
-    print("\n--- Clasificación de Proveedores ---")
+        
     print("1. Top 5 Global")
     print("2. Top 5 por Servicio")
     try:
@@ -144,9 +159,9 @@ def ranking_menu(btree):
         elif opt == 2:
             show_top5_by_service(btree)
         else:
-            print("Opción inválida")
+            print(RED + "Opción inválida" + RESET)
     except ValueError:
-        print("Ingrese un número válido")
+        print(RED + "Ingrese un número válido" + RESET)
 
 def go_out():
     global general_continue
