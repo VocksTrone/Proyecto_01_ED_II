@@ -19,7 +19,8 @@ def menu():
     print("1. Registrar Proveedor")
     print("2. Buscar Servicio")
     print("3. Mostrar Proveedores")
-    print("4. Salir")
+    print("4. Clasificación Top 5 Proveedores")
+    print("5. Salir")
     option = int(input("Ingrese una opción: "))
     return option
 
@@ -32,9 +33,11 @@ def switch(option, btree):
         case 3:
             show_providers(btree)
         case 4:
+            ranking_menu(btree)
+        case 5:
             go_out()
         case _:
-            print("\nERROR!, Ingrese una opción válida (1 - 4)")
+            print("\nERROR!, Ingrese una opción válida (1 - 5)")
 
 def register_provider(btree):
     provider_id = randint(1000, 9999)
@@ -104,6 +107,46 @@ def show_providers(btree):
         return
     print("\nLista de Proveedores:")
     btree.traverse()
+
+def show_top5_global(btree):
+    providers = []
+    btree._collect(btree.root, providers)
+    providers.sort(key=lambda p: p.rating, reverse=True)
+
+    print("\nClasificación Top 5 Global")
+    for i, provider in enumerate(providers[:5], start=1):
+        print(f"{i}. {provider}")
+
+def show_top5_by_service(btree):
+    service = input("\nIngrese el servicio para ver el Top 5: ")
+    results = btree.search_by_service(service)
+
+    if results:
+        results.sort(key=lambda p: p.rating, reverse=True)
+        print(f"\nClasificación Top 5 de {service.capitalize()}")
+        for i, provider in enumerate(results[:5], start=1):
+            print(f"{i}. {provider}")
+    else:
+        print(f"\nNo se encontraron proveedores para el servicio '{service}'")
+
+def ranking_menu(btree):
+    if btree.is_empty():
+        print("\nNo hay proveedores registrados")
+        return
+
+    print("\n--- Clasificación de Proveedores ---")
+    print("1. Top 5 Global")
+    print("2. Top 5 por Servicio")
+    try:
+        opt = int(input("Seleccione una opción: "))
+        if opt == 1:
+            show_top5_global(btree)
+        elif opt == 2:
+            show_top5_by_service(btree)
+        else:
+            print("Opción inválida")
+    except ValueError:
+        print("Ingrese un número válido")
 
 def go_out():
     global general_continue
