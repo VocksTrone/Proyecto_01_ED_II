@@ -1,5 +1,6 @@
 from btree import BTree, Provider
 from random import randint, uniform
+import time
 
 general_continue = True
 
@@ -14,12 +15,12 @@ def main():
             print("\nERROR!, Ingrese un dato válido")
 
 def menu():
-    print("\nServicios Locales")
-    print("\n1. Registrar Proveedor")
+    print("\n---Servicios Locales---")
+    print("1. Registrar Proveedor")
     print("2. Buscar Servicio")
     print("3. Mostrar Proveedores")
     print("4. Salir")
-    option = int(input("\nIngrese una opción: "))
+    option = int(input("Ingrese una opción: "))
     return option
 
 def switch(option, btree):
@@ -41,8 +42,8 @@ def register_provider(btree):
     if btree.exists_id(provider_id):
         print("\nERROR!, El ID del proveedor ya existe")
         return
-    name = input("\nIngrese el nombre del proveedor: ")
-    service = input("\nIngrese el servicio principal del proveedor: ")
+    name = input("Ingrese el nombre del proveedor: ")
+    service = input("Ingrese el servicio principal del proveedor: ")
     rating = calculate_rating()
     provider = Provider(provider_id, name, service, rating)
     btree.insert(provider)
@@ -58,14 +59,44 @@ def search_service(btree):
     if btree.is_empty():
         print("\nNo hay proveedores registrados")
         return
+
     service = input("\nIngrese el servicio a buscar: ")
     results = btree.search_by_service(service)
+
     if results:
         print(f"\nProveedores que ofrecen el servicio -{service}-:")
-        for provider in sorted(results, key=lambda x: x.rating, reverse=True):
+        ordered = sorted(results, key=lambda x: x.rating, reverse=True)
+        for provider in ordered:
             print(provider)
+
+        contratar = input("\n¿Desea contratar un servicio? (s/n): ").strip().lower()
+        if contratar == "s":
+            try:
+                prov_id = int(input("\nIngrese el ID del proveedor que desea contratar: "))
+                selected = next((p for p in ordered if p.provider_id == prov_id), None)
+
+                if selected:
+                    print(f"\nContrato iniciado con {selected.name} ({selected.service})...")
+                    time.sleep(5)
+                    print("\nContrato finalizado")
+                    while True:
+                        try:
+                            new_rating = float(input("Califique el servicio (1.0 - 5.0): "))
+                            if 1.0 <= new_rating <= 5.0:
+                                selected.rating = round((selected.rating + new_rating) / 2, 1)
+                                print(f"\nNueva calificación promedio de {selected.name}: {selected.rating}★")
+                                break
+                            else:
+                                print("Ingrese un valor entre 1.0 y 5.0")
+                        except ValueError:
+                            print("Ingrese un número válido")
+                else:
+                    print("\nNo se encontró un proveedor con ese ID")
+            except ValueError:
+                print("\nIngrese un número válido")
     else:
         print("\nNo se encontraron proveedores para el servicio solicitado")
+
 
 def show_providers(btree):
     if btree.is_empty():
