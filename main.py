@@ -88,8 +88,8 @@ def search_service(btree):
         for provider in ordered:
             print(provider)
 
-        contratar = input("\n¿Desea contratar un servicio? (s/n): ").strip().lower()
-        if contratar == "s":
+        hire = input("\n¿Desea contratar un servicio? (s/n): ").strip().lower()
+        if hire == "s":
             try:
                 prov_id = int(input("\nIngrese el ID del proveedor que desea contratar: "))
                 selected = next((p for p in ordered if p.provider_id == prov_id), None)
